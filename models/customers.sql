@@ -25,6 +25,15 @@ customer_orders as (
 
 ),
 
+ltv as (
+    select
+        customer_id,
+        SUM(amount) AS lifetime_value
+    from {{ ref('orders')}}
+    group by 
+        customer_id
+),
+
 
 final as (
 
@@ -34,11 +43,13 @@ final as (
         customers.last_name,
         customer_orders.first_order_date,
         customer_orders.most_recent_order_date,
-        coalesce(customer_orders.number_of_orders, 0) as number_of_orders
-
+        coalesce(customer_orders.number_of_orders, 0) as number_of_orders,
+        IFNULL(ltv.lifetime_value, 0) AS lifetime_value
     from customers
 
     left join customer_orders using (customer_id)
+    left join ltv
+        on ltv.customer_id = customers.customer_id
 
 )
 
