@@ -1,0 +1,37 @@
+version: 2
+sources:
+  - name: stripe
+    database: raw
+    tables:
+      - name: payment
+        description: Source table containing all payments
+        columns: 
+          - name: id
+            description: This is the payment ID
+            tests:
+              - not_null
+          - name: orderid
+            description: This is the order ID
+            tests:
+              - not_null
+          - name: paymentmethod
+            description: This is the way the payment is done
+            tests:
+              - accepted_values:
+                  values:
+                    - credit_card
+                    - coupon
+                    - bank_transfer
+                    - gift_card
+          - name: status
+            description: This is the payment status
+            tests:
+              - not_null
+          - name: amount
+            description: This is the payment amount * 100
+            tests:
+              - not_null 
+          - name: created
+            description: This is the payment date
+            tests:
+              - not_null
