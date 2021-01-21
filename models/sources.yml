@@ -7,14 +7,71 @@ sources:
         description: Source table containing all customers
       - name: orders
         description: Source table containing all orders
-        
+        columns: 
+          - name: id
+            description: Primary key of the orders table
+            tests:
+              - unique
+              - not_null
+          - name: user_id
+            description: The user_id
+            tests:
+              - not_null
+          - name: order_date
+            description: The date on which an order took place
+            tests:
+              - not_null
+          - name: status
+            description: Can change over time
+            tests:
+              - not_null
+              - accepted_values:
+                  values:
+                    - returned
+                    - completed
+                    - return_pending
+                    - shipped
+                    - placed
+          - name: _ETL_LOADED_AT
+
+        loaded_at_field: _ETL_LOADED_AT
+
+        freshness:
+          warn_after: {count: 12, period: hour}
+          error_after: {count: 24, period: hour}
+
   - name: stripe
     database: raw
     tables:
       - name: payment
         description: Source table containing all payments
-        loaded_at_field: _BATCHED_AT
-
-        freshness:
-          warn_after: {count: 12, period: hour}
-          error_after: {count: 24, period: hour}
+        columnns:
+          - name: id
+            description: This is the payment ID
+            tests:
+              - not_null
+          - name: orderid
+            description: This is the order ID
+            tests:
+              - not_null
+          - name: paymentmethod
+            description: This is the way the payment is done
+            tests:
+              - accepted_values:
+                  values:
+                    - credit_card
+                    - coupon
+                    - bank_transfer
+                    - gift_card
+          - name: status
+            description: This is the payment status
+            tests:
+              - not_null
+          - name: amount
+            description: This is the payment amount * 100
+            tests:
+              - not_null 
+          - name: created
+            description: This is the payment date
+            tests:
+              - not_null 
